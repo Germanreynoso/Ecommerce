@@ -9,10 +9,9 @@ export class FileUploadService {
 
   constructor(private readonly cloudinaryService: CloudinaryService) {}
 
-  async uploadFile(file: UploadFileDto) {
-    // Llama al servicio de Cloudinary para subir el archivo
-    const result = await this.cloudinaryService.uploadFile(file.buffer, file.originalname);
-    return result;
+  async uploadFile(file: UploadFileDto): Promise<{ url: string }> {
+    const url = await this.cloudinaryService.uploadFile(file.buffer, file.originalname);
+    return { url };
   }
 
   async create(createFileUploadDto: CreateFileUploadDto) {
@@ -48,5 +47,19 @@ export class FileUploadService {
     if (!result) {
       throw new NotFoundException(`File with id ${id} not found`);
     }
+  }
+
+  // Método para manejar la carga de imágenes
+  async uploadImage(id: string, file: Express.Multer.File): Promise<{ url: string }> {
+    const fileDto: UploadFileDto = {
+      fieldname: file.fieldname,
+      buffer: file.buffer,
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+    };
+
+    const url = await this.uploadFile(fileDto);
+    return { url: url.url };
   }
 }

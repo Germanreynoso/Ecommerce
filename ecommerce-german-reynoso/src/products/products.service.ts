@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { FileUploadService } from 'src/file-upload/file-upload.service';
 import { UploadFileDto } from 'src/file-upload/dto/upload-file.dto';
+
 @Injectable()
 export class ProductsService {
   constructor(
@@ -15,7 +16,6 @@ export class ProductsService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    console.log('createProductDto:', createProductDto);
     const newProduct = this.productRepository.create(createProductDto);
     return await this.productRepository.save(newProduct);
   }
@@ -36,12 +36,11 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
-    await this.productRepository.update(id, updateProductDto);
-    const updatedProduct = await this.productRepository.findOne({ where: { id } });
-    if (!updatedProduct) {
+    const result = await this.productRepository.update(id, updateProductDto);
+    if (result.affected === 0) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
-    return updatedProduct;
+    return this.productRepository.findOne({ where: { id } });
   }
 
   async buyProduct(id: string): Promise<number> {
@@ -55,7 +54,6 @@ export class ProductsService {
     await this.productRepository.update(id, {
       stock: product.stock - 1,
     });
-    console.log('Product bought successfully');
     return product.price;
   }
 
@@ -67,14 +65,8 @@ export class ProductsService {
   }
 
   async uploadFile(file: UploadFileDto, id: string) {
-    const url = await this.fileUploadService.uploadFile({
-      fieldname: file.fieldname,
-      buffer: file.buffer,
-      originalname: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-    });
-    await this.productRepository.update(id, { imgUrl: url });
-    return { imgUrl: url };
+    const result = await this.fileUploadService.uploadFile(file);
+    await this.productRepository.update(id, { imgUrl: result.url }); // Usa `result.url`
+    return { imgUrl: result.url };
   }
 }

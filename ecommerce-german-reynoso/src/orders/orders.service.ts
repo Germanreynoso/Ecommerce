@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateOrderDto, ProductId } from './dto/create-order.dto';
+import { CreateOrderDto, ProductIdDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -46,7 +46,7 @@ export class OrdersService {
     return new OrderResponseDto(orderDetailEntity);
   }
 
-  private async calculateTotal(products: Array<ProductId>): Promise<number> {
+  private async calculateTotal(products: Array<ProductIdDto>): Promise<number> {
     let total = 0;
     for (const product of products) {
       total += await this.productService.buyProduct(product.id);

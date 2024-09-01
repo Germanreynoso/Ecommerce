@@ -3,8 +3,8 @@ import { Product } from 'src/products/entities/product.entity';  // Asegúrate d
 
 @Entity()
 export class Category {
-  @PrimaryGeneratedColumn()
-  id: number;
+   @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;

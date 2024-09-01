@@ -4,7 +4,7 @@ import { OrderDetail } from 'src/order-details/entities/order-detail.entity';
 
 @Entity()
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -14,5 +14,5 @@ export class Order {
   user: User;
   
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.order)
-  details: OrderDetail[]; 
+  details: OrderDetail[];
 }

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
 import { Order } from 'src/orders/entities/order.entity';
+
 export enum Role {
   User = 'user',
   Admin = 'admin',
@@ -25,7 +26,7 @@ export class User {
   @Column({ nullable: true })
   city: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   address: string; 
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -34,8 +35,9 @@ export class User {
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 
-  @Column()
-  createdAt: string;
-  @Column({default: Role.User })
-  administrator: string
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ type: 'enum', enum: Role, default: Role.User })
+  role: Role;
 }

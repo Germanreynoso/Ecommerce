@@ -9,13 +9,11 @@ import { AuthGuard } from 'src/guard/auth.guard';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-
   @Post()
-  @HttpCode(201)
-  create(@Body() createProductDto: CreateProductDto) {
+  @UseGuards(AuthGuard) // Protege este endpoint
+  async create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
-
   @Get()
   @HttpCode(200)
   findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
@@ -34,6 +32,7 @@ export class ProductsController {
 
   @Put(':id')
   @HttpCode(200)
+  @UseGuards(AuthGuard)
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -47,6 +46,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   @HttpCode(200)
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     const product = await this.productsService.findOne(id);
